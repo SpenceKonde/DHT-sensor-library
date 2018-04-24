@@ -44,6 +44,10 @@ class DHT {
    float convertFtoC(float);
    float computeHeatIndex(float temperature, float percentHumidity, bool isFahrenheit=true);
    float readHumidity(bool force=false);
+   int readTemperatureInt(bool S=false, bool force=false);
+   int convertCtoFInt(int);
+   int convertFtoCInt(int);
+   int readHumidityInt(bool force=false);
    boolean read(bool force=false);
 
  private:
