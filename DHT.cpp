@@ -60,15 +60,50 @@ float DHT::readTemperature(bool S, bool force) {
   }
   return f;
 }
+int DHT::readTemperatureInt(bool S, bool force) {
+  int f=0;
+
+  if (read(force)) {
+    switch (_type) {
+    case DHT11:
+      f = data[2]*10;
+      if(S) {
+        f = convertCtoF(f);
+      }
+      break;
+    case DHT22:
+    case DHT21:
+      f = (data[2] & 0x7F)<<8;
+      f += data[3];
+      if (data[2] & 0x80) {
+        f *= -1;
+      }
+      if(S) {
+        f = convertCtoF(f);
+      }
+      break;
+    }
+  }
+  if (S){f=convertCtoFInt(f);
+  return f;
+}
 
 float DHT::convertCtoF(float c) {
-  return c * 1.8 + 32;
+  return c*1.8 + 32;
 }
 
 float DHT::convertFtoC(float f) {
   return (f - 32) * 0.55555;
 }
+int DHT::convertCtoFInt(int c) {
+  return (c *18/10) + 32;
+}
 
+int DHT::convertFtoCInt(int f) {
+  return (f - 32) * 10)/18;
+}
+  
+  
 float DHT::readHumidity(bool force) {
   float f = NAN;
   if (read()) {
@@ -87,7 +122,21 @@ float DHT::readHumidity(bool force) {
   }
   return f;
 }
-
+unsigned int DHT::readHumidityInt(bool force) {
+  unsigned int f = 0;
+  if (read()) {
+    switch (_type) {
+    case DHT11:
+      f = data[0]*10;
+      break;
+    case DHT22:
+    case DHT21:
+      f = data[0]<<8+data[1];
+      break;
+    }
+  }
+  return f;
+}
 //boolean isFahrenheit: True == Fahrenheit; False == Celcius
 float DHT::computeHeatIndex(float temperature, float percentHumidity, bool isFahrenheit) {
   // Using both Rothfusz and Steadman's equations
